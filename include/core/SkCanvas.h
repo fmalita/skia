@@ -33,6 +33,7 @@ class SkPicture;
 class SkRRect;
 class SkSurface;
 class SkSurface_Base;
+class SkTextBlob;
 class GrContext;
 class GrRenderTarget;
 
@@ -956,6 +957,9 @@ public:
                                 const SkPath& path, const SkMatrix* matrix,
                                 const SkPaint& paint);
 
+    void EXPERIMENTAL_drawTextBlob(const SkTextBlob* blob, const SkPaint& paint,
+                                   const SkPoint* offset = NULL);
+
     /** PRIVATE / EXPERIMENTAL -- do not call
         Perform back-end analysis/optimization of a picture. This may attach
         optimization data to the picture which can be used by a later
@@ -1233,6 +1237,9 @@ protected:
     
     virtual void onDrawPatch(const SkPoint cubics[12], const SkColor colors[4],
                            const SkPoint texCoords[4], SkXfermode* xmode, const SkPaint& paint);
+
+    virtual void onDrawTextBlob(const SkTextBlob* blob, const SkPaint& paint,
+                                const SkPoint* offset);
 
     enum ClipEdgeStyle {
         kHard_ClipEdgeStyle,

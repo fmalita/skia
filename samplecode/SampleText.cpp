@@ -20,6 +20,7 @@
 #include "SkUtils.h"
 #include "SkColorPriv.h"
 #include "SkColorFilter.h"
+#include "SkTextBlob.h"
 #include "SkTime.h"
 #include "SkTypeface.h"
 #include "SkXfermode.h"
@@ -88,12 +89,20 @@ static void DrawTheText(SkCanvas* canvas, const char text[], size_t length, SkSc
             pts[i].set(xpos, y), xpos += paint.getTextSize();
         }
         canvas->drawPosText(text, length, pts, paint);
+
+        SkPoint offset = SkPoint::Make(0, 400);
+        SkAutoTUnref<SkTextBlob> blob(SkTextBlob::Create(text, length, paint, pts));
+        canvas->EXPERIMENTAL_drawTextBlob(blob, paint, &offset);
     }
 #endif
 
     p.setSubpixelText(true);
     x += SkIntToScalar(180);
     canvas->drawText(text, length, x, y, p);
+
+    SkPoint blobOffset = SkPoint::Make(x, y + 400);
+    SkAutoTUnref<SkTextBlob> blob(SkTextBlob::Create(text, length, p));
+    canvas->EXPERIMENTAL_drawTextBlob(blob, p, &blobOffset);
 
 #ifdef SK_DEBUG
     if (true) {
