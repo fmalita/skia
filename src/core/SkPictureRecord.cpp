@@ -1202,6 +1202,11 @@ void SkPictureRecord::onDrawTextOnPath(const void* text, size_t byteLength, cons
     this->validate(initialOffset, size);
 }
 
+void SkPictureRecord::onDrawTextBlob(const SkTextBlob* blob, const SkPaint& paint,
+                                     const SkPoint* offset) {
+
+}
+
 void SkPictureRecord::onDrawPicture(const SkPicture* picture, const SkMatrix* matrix,
                                     const SkPaint* paint) {
     // op + picture index

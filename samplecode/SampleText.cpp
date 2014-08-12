@@ -92,7 +92,7 @@ static void DrawTheText(SkCanvas* canvas, const char text[], size_t length, SkSc
 
         SkPoint offset = SkPoint::Make(0, 400);
         SkAutoTUnref<SkTextBlob> blob(SkTextBlob::Create(text, length, paint, pts));
-        canvas->EXPERIMENTAL_drawTextBlob(blob, paint, &offset);
+        canvas->drawTextBlob(blob, paint, &offset);
     }
 #endif
 
@@ -102,7 +102,7 @@ static void DrawTheText(SkCanvas* canvas, const char text[], size_t length, SkSc
 
     SkPoint blobOffset = SkPoint::Make(x, y + 400);
     SkAutoTUnref<SkTextBlob> blob(SkTextBlob::Create(text, length, p));
-    canvas->EXPERIMENTAL_drawTextBlob(blob, p, &blobOffset);
+    canvas->drawTextBlob(blob, p, &blobOffset);
 
 #ifdef SK_DEBUG
     if (true) {

@@ -10,6 +10,7 @@
 
 #include "SkCanvas.h"
 #include "SkPicture.h"
+#include "SkTextBlob.h"
 
 class SkPictureBox {
 public:
@@ -23,6 +24,18 @@ private:
     SkPictureBox& operator=(const SkPictureBox&);
 
     const SkPicture* fObj;
+};
+
+template <typename T>
+class SkRefBox : SkNoncopyable {
+public:
+    SkRefBox(const T* obj) : fObj(SkRef(obj)) {}
+    ~SkRefBox() { fObj->unref(); }
+
+    operator const T*() const { return fObj; }
+
+private:
+    const T* fObj;
 };
 
 namespace SkRecords {
@@ -69,6 +82,7 @@ namespace SkRecords {
     M(DrawSprite)                                                   \
     M(DrawText)                                                     \
     M(DrawTextOnPath)                                               \
+    M(DrawTextBlob)                                               \
     M(DrawVertices)
 
 // Defines SkRecords::Type, an enum of all record types.
@@ -244,6 +258,7 @@ RECORD5(DrawPosTextH, SkPaint, paint,
                       size_t, byteLength,
                       PODArray<SkScalar>, xpos,
                       SkScalar, y);
+RECORD3(DrawTextBlob, SkRefBox<SkTextBlob>, blob, SkPaint, paint, Optional<SkPoint>, offset);
 RECORD2(DrawRRect, SkPaint, paint, SkRRect, rrect);
 RECORD2(DrawRect, SkPaint, paint, SkRect, rect);
 RECORD4(DrawSprite, Optional<SkPaint>, paint, ImmutableBitmap, bitmap, int, left, int, top);

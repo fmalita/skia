@@ -957,8 +957,7 @@ public:
                                 const SkPath& path, const SkMatrix* matrix,
                                 const SkPaint& paint);
 
-    void EXPERIMENTAL_drawTextBlob(const SkTextBlob* blob, const SkPaint& paint,
-                                   const SkPoint* offset = NULL);
+    void drawTextBlob(const SkTextBlob* blob, const SkPaint& paint, const SkPoint* offset = NULL);
 
     /** PRIVATE / EXPERIMENTAL -- do not call
         Perform back-end analysis/optimization of a picture. This may attach

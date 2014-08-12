@@ -2254,8 +2254,7 @@ void SkCanvas::drawTextOnPath(const void* text, size_t byteLength, const SkPath&
     this->onDrawTextOnPath(text, byteLength, path, matrix, paint);
 }
 
-void SkCanvas::EXPERIMENTAL_drawTextBlob(const SkTextBlob* blob, const SkPaint& paint,
-                                         const SkPoint* offset) {
+void SkCanvas::drawTextBlob(const SkTextBlob* blob, const SkPaint& paint, const SkPoint* offset) {
     if (NULL != blob) {
         this->onDrawTextBlob(blob, paint, offset);
     }
