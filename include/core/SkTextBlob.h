@@ -62,6 +62,8 @@ public:
 
     ~SkTextBlob();
 
+    uint32_t uniqueID() const;
+
     class SK_API Iter {
     public:
         Iter(const SkTextBlob* blob) : fBlob(blob), fIndex(0) { SkASSERT(blob); }
@@ -77,7 +79,8 @@ public:
 private:
     SkTextBlob(const SkTDArray<SkTextChunk*>& chunks);
 
-    SkTDArray<SkTextChunk*>  fChunks;
+    const SkTDArray<SkTextChunk*>  fChunks;
+    mutable uint32_t               fUniqueID;
 };
 
 class SK_API SkTextBlobBuilder {

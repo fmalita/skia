@@ -1207,8 +1207,8 @@ void SkPictureRecord::onDrawTextOnPath(const void* text, size_t byteLength, cons
 
 void SkPictureRecord::onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
                                      const SkPaint& paint) {
-    // op + paint index + offset + chunk count
-    size_t size = 3 * kUInt32Size + sizeof(SkPoint);
+    // op + paint index + UID + chunk count + offset
+    size_t size = 4 * kUInt32Size + sizeof(SkPoint);
     unsigned chunk_count = 0;
 
     {
@@ -1218,8 +1218,8 @@ void SkPictureRecord::onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offs
         while (const SkTextChunk* chunk = iter.next()) {
             chunk_count++;
 
-            // len + UID + flags + bounds bool
-            size += 4 * kUInt32Size;
+            // len + flags + bounds bool
+            size += 3 * kUInt32Size;
             if (!chunk->fBoundsDirty) {
                 size += sizeof(chunk->fBounds);
             }
@@ -1233,13 +1233,13 @@ void SkPictureRecord::onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offs
     size_t initialOffset = this->addDraw(DRAW_TEXT_BLOB, &size);
     SkASSERT(initialOffset+getPaintOffset(DRAW_TEXT_ON_PATH, size) == fWriter.bytesWritten());
     this->addPaint(paint);
-    this->addPoint(offset);
+    this->addInt(blob->uniqueID());
     this->addInt(chunk_count);
+    this->addPoint(offset);
 
     SkTextBlob::Iter iter(blob);
     while (const SkTextChunk* chunk = iter.next()) {
         this->addInt(SkToInt(chunk->fGlyphCount));
-        this->addInt(0); // FIXME: UID
         this->addInt(chunk->fScalarsPerPos);
         this->addRectPtr(chunk->fBoundsDirty ? NULL : &chunk->fBounds);
         fWriter.writePad(chunk->fGlyphs, chunk->fGlyphCount * sizeof(uint16_t));

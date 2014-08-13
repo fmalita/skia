@@ -129,7 +129,8 @@ SkTextBlob* SkTextBlob::Create(const SkTDArray<SkTextChunk*>& chunks) {
 }
 
 SkTextBlob::SkTextBlob(const SkTDArray<SkTextChunk*>& chunks)
-    : fChunks(chunks) {
+    : fChunks(chunks)
+    , fUniqueID(SK_InvalidGenID) {
 }
 
 SkTextBlob::~SkTextBlob() {
@@ -137,6 +138,18 @@ SkTextBlob::~SkTextBlob() {
     while (const SkTextChunk* chunk = it.next()) {
         SkDELETE(chunk);
     }
+}
+
+uint32_t SkTextBlob::uniqueID() const {
+    static int32_t  gTextBlobGenerationID; // = 0;
+
+    // do a loop in case our global wraps around, as we never want to
+    // return SK_InvalidGenID
+    while (SK_InvalidGenID == fUniqueID) {
+        fUniqueID = sk_atomic_inc(&gTextBlobGenerationID) + 1;
+    }
+
+    return fUniqueID;
 }
 
 SkTextBlobBuilder::SkTextBlobBuilder() {
