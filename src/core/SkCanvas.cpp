@@ -2226,11 +2226,20 @@ void SkCanvas::onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
                               const SkPaint& paint) {
     SkASSERT(blob);
 
+    // FIXME: should we send the offset to the device?
     if (!offset.isZero()) {
         translate(offset.x(), offset.y());
     }
 
-    blob->draw(this, paint);
+    LOOPER_BEGIN(paint, SkDrawFilter::kText_Type, NULL)
+
+    while (iter.next()) {
+        SkDeviceFilteredPaint dfp(iter.fDevice, looper.paint());
+        iter.fDevice->drawTextBlob(iter, blob, dfp.paint());
+        // DrawTextDecorations?
+    }
+
+    LOOPER_END
 
     if (!offset.isZero()) {
         translate(-offset.x(), -offset.y());
@@ -2257,7 +2266,9 @@ void SkCanvas::drawTextOnPath(const void* text, size_t byteLength, const SkPath&
 
 void SkCanvas::drawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
                             const SkPaint& paint) {
-    this->onDrawTextBlob(blob, offset, paint);
+    if (NULL != blob) {
+        this->onDrawTextBlob(blob, offset, paint);
+    }
 }
 
 void SkCanvas::drawVertices(VertexMode vmode, int vertexCount,

@@ -13,7 +13,8 @@
 #include "SkRefCnt.h"
 #include "SkTDArray.h"
 
-class SkCanvas;
+class SkBaseDevice;
+class SkDraw;
 class SkPoint;
 
 class SK_API SkTextChunk {
@@ -27,7 +28,7 @@ public:
 
     ~SkTextChunk();
 
-    void draw(SkCanvas* canvas, const SkPaint& paint) const;
+    void draw(SkBaseDevice*, const SkDraw&, const SkPaint&) const;
     const SkRect& bounds() const;
 
 private:
@@ -37,43 +38,41 @@ private:
     SkTextChunk(const uint16_t* glyphs, size_t count, const SkPoint* pos, const SkPaint& paint,
                 const SkRect* bounds);
 
-    void init(const uint16_t*, size_t, const SkRect*);
-
-    enum Positioning {
-        kNone_Positioning,
-        kScalar_Positioning,
-        kPoint_Positioning,
-    };
+    void init(const uint16_t*, size_t, const SkRect*, const SkScalar*);
 
     size_t         fGlyphCount;
     uint16_t*      fGlyphs;
-
-    union {
-        // FIXME: merge glyphs/pos storage to reduce internal fragmentation & obj size?
-        SkPoint*   fPos;
-        SkScalar*  fPosH;
-    };
+    SkScalar*      fPos;  // FIXME: merge glyphs/pos storage?
 
     SkPaint        fFont; // FIXME: SkFont
 
     mutable SkRect fBounds;
-    mutable bool   fBoundsDirty : 1;
+    mutable bool   fBoundsDirty   : 1;
 
-    Positioning    fPositioning : 2;
+    unsigned       fScalarsPerPos : 2;
 };
 
 class SK_API SkTextBlob : public SkRefCnt {
 public:
     static SkTextBlob* Create(SkTextChunk* chunk);
+    static SkTextBlob* Create(const SkTDArray<SkTextChunk*>& chunks);
 
     ~SkTextBlob();
 
-    void draw(SkCanvas* canvas, const SkPaint& paint) const;
+    class SK_API Iter {
+    public:
+        Iter(const SkTextBlob* blob) : fBlob(blob), fIndex(0) { SkASSERT(blob); }
+        const SkTextChunk* next() {
+            return (fIndex < fBlob->fChunks.count()) ? fBlob->fChunks[fIndex++] : NULL;
+        }
+
+    private:
+        const SkTextBlob* fBlob;
+        int fIndex;
+    };
 
 private:
-    SkTextBlob(SkTDArray<SkTextChunk*>& chunks);
-
-    friend class SkTextBlobBuilder;
+    SkTextBlob(const SkTDArray<SkTextChunk*>& chunks);
 
     SkTDArray<SkTextChunk*>  fChunks;
 };

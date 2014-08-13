@@ -242,6 +242,11 @@ protected:
                               const SkColor colors[], SkXfermode* xmode,
                               const uint16_t indices[], int indexCount,
                               const SkPaint& paint) = 0;
+
+    // Default impl uses the draw text methods.
+    virtual void drawTextBlob(const SkDraw&, const SkTextBlob* blob,
+                              const SkPaint& paint);
+
     // default implementation calls drawVertices
     virtual void drawPatch(const SkDraw&, const SkPoint cubics[12], const SkColor colors[4],
                            const SkPoint texCoords[4], SkXfermode* xmode, const SkPaint& paint);
@@ -362,6 +367,7 @@ private:
     friend class SkDeferredDevice;    // for newSurface
 
     friend class SkSurface_Raster;
+    friend class SkTextChunk; // FIXME: ewww
 
     // used to change the backend's pixels (and possibly config/rowbytes)
     // but cannot change the width/height, so there should be no change to

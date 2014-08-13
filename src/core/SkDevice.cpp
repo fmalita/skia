@@ -9,6 +9,7 @@
 #include "SkDraw.h"
 #include "SkMetaData.h"
 #include "SkPatchUtils.h"
+#include "SkTextBlob.h"
 
 SkBaseDevice::SkBaseDevice()
     : fLeakyProperties(SkDeviceProperties::MakeDefault())
@@ -90,6 +91,13 @@ void SkBaseDevice::drawPatch(const SkDraw& draw, const SkPoint cubics[12], const
     this->drawVertices(draw, SkCanvas::kTriangles_VertexMode, data.fVertexCount, data.fPoints,
                        data.fTexCoords, data.fColors, xmode, data.fIndices, data.fIndexCount,
                        paint);
+}
+
+void SkBaseDevice::drawTextBlob(const SkDraw& draw, const SkTextBlob *blob, const SkPaint &paint) {
+    SkTextBlob::Iter iter(blob);
+    while (const SkTextChunk* chunk = iter.next()) {
+        chunk->draw(this, draw, paint);
+    }
 }
 
 bool SkBaseDevice::readPixels(const SkImageInfo& info, void* dstP, size_t rowBytes, int x, int y) {
