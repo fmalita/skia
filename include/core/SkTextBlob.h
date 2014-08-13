@@ -13,9 +13,10 @@
 #include "SkRefCnt.h"
 #include "SkTDArray.h"
 
+class SkCanvas;
 class SkPoint;
 
-class SkTextChunk {
+class SK_API SkTextChunk {
 public:
     static SkTextChunk* Create(const uint16_t* glyphs, size_t count, const SkPaint& paint,
                                const SkRect* bounds = NULL);
@@ -32,6 +33,7 @@ public:
 
     ~SkTextChunk();
 
+    void draw(SkCanvas* canvas, const SkPaint& paint) const;
     const SkRect& bounds() const;
 
 private:
@@ -60,11 +62,13 @@ private:
     Positioning    fPositioning : 2;
 };
 
-class SkTextBlob : SkRefCnt {
+class SK_API SkTextBlob : public SkRefCnt {
 public:
-    static const SkTextBlob* Create(SkTextChunk* chunk);
+    static SkTextBlob* Create(SkTextChunk* chunk);
 
     ~SkTextBlob();
+
+    void draw(SkCanvas* canvas, const SkPaint& paint) const;
 
 private:
     SkTextBlob(SkTDArray<SkTextChunk*>& chunks);
@@ -74,7 +78,7 @@ private:
     SkTDArray<SkTextChunk*>  fChunks;
 };
 
-class SkTextBlobBuilder {
+class SK_API SkTextBlobBuilder {
 public:
     SkTextBlobBuilder();
     ~SkTextBlobBuilder();

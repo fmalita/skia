@@ -22,6 +22,7 @@
 #include "SkSmallAllocator.h"
 #include "SkSurface_Base.h"
 #include "SkTemplates.h"
+#include "SkTextBlob.h"
 #include "SkTextFormatParams.h"
 #include "SkTLazy.h"
 #include "SkUtils.h"
@@ -2221,6 +2222,21 @@ void SkCanvas::onDrawTextOnPath(const void* text, size_t byteLength, const SkPat
     LOOPER_END
 }
 
+void SkCanvas::onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
+                              const SkPaint& paint) {
+    SkASSERT(blob);
+
+    if (!offset.isZero()) {
+        translate(offset.x(), offset.y());
+    }
+
+    blob->draw(this, paint);
+
+    if (!offset.isZero()) {
+        translate(-offset.x(), -offset.y());
+    }
+}
+
 // These will become non-virtual, so they always call the (virtual) onDraw... method
 void SkCanvas::drawText(const void* text, size_t byteLength, SkScalar x, SkScalar y,
                         const SkPaint& paint) {
@@ -2237,6 +2253,11 @@ void SkCanvas::drawPosTextH(const void* text, size_t byteLength, const SkScalar 
 void SkCanvas::drawTextOnPath(const void* text, size_t byteLength, const SkPath& path,
                               const SkMatrix* matrix, const SkPaint& paint) {
     this->onDrawTextOnPath(text, byteLength, path, matrix, paint);
+}
+
+void SkCanvas::drawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
+                            const SkPaint& paint) {
+    this->onDrawTextBlob(blob, offset, paint);
 }
 
 void SkCanvas::drawVertices(VertexMode vmode, int vertexCount,

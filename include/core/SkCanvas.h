@@ -33,6 +33,7 @@ class SkPicture;
 class SkRRect;
 class SkSurface;
 class SkSurface_Base;
+class SkTextBlob;
 class GrContext;
 class GrRenderTarget;
 
@@ -956,6 +957,8 @@ public:
                                 const SkPath& path, const SkMatrix* matrix,
                                 const SkPaint& paint);
 
+    void drawTextBlob(const SkTextBlob* blob, const SkPoint& offset, const SkPaint& paint);
+
     /** PRIVATE / EXPERIMENTAL -- do not call
         Perform back-end analysis/optimization of a picture. This may attach
         optimization data to the picture which can be used by a later
@@ -1230,6 +1233,9 @@ protected:
     virtual void onDrawTextOnPath(const void* text, size_t byteLength,
                                   const SkPath& path, const SkMatrix* matrix,
                                   const SkPaint& paint);
+
+    virtual void onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
+                                const SkPaint& paint);
     
     virtual void onDrawPatch(const SkPoint cubics[12], const SkColor colors[4],
                            const SkPoint texCoords[4], SkXfermode* xmode, const SkPaint& paint);

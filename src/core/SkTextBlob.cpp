@@ -1,6 +1,8 @@
 
 #include "SkTextBlob.h"
 
+#include "SkCanvas.h"
+
 SkTextChunk* SkTextChunk::Create(const uint16_t* glyphs, size_t count, const SkPaint& paint,
                                  const SkRect* bounds) {
     if (NULL == glyphs || 0 == count) {
@@ -99,7 +101,27 @@ const SkRect& SkTextChunk::bounds() const {
     return fBounds;
 }
 
-const SkTextBlob* SkTextBlob::Create(SkTextChunk *chunk) {
+void SkTextChunk::draw(SkCanvas *canvas, const SkPaint& paint) const {
+    SkASSERT(NULL != canvas);
+    SkASSERT(SkPaint::kGlyphID_TextEncoding == paint.getTextEncoding());
+
+    size_t length = sizeof(uint16_t) * fGlyphCount;
+    switch (fPositioning) {
+    case kNone_Positioning:
+        canvas->drawText(fGlyphs, length, 0, 0, paint);
+        break;
+    case kScalar_Positioning:
+        canvas->drawPosTextH(fGlyphs, length, fPosH, 0, paint);
+        break;
+    case kPoint_Positioning:
+        canvas->drawPosText(fGlyphs, length, fPos, paint);
+        break;
+    default:
+        SkFAIL("unhandled positioning value");
+    }
+}
+
+SkTextBlob* SkTextBlob::Create(SkTextChunk *chunk) {
     SkTDArray<SkTextChunk*> chunks;
     chunks.setReserve(1);
     *chunks.append() = chunk;
@@ -109,6 +131,17 @@ const SkTextBlob* SkTextBlob::Create(SkTextChunk *chunk) {
 SkTextBlob::SkTextBlob(SkTDArray<SkTextChunk*>& chunks)
     : fChunks(chunks) {
 }
+SkTextBlob::~SkTextBlob() {
+    for (int i = 0; i < fChunks.count(); ++i) {
+        SkDELETE(fChunks[i]);
+    }
+}
+
+void SkTextBlob::draw(SkCanvas* canvas, const SkPaint& paint) const {
+    for (int i = 0; i < fChunks.count(); ++i) {
+        fChunks[i]->draw(canvas, paint);
+    }
+}
 
 SkTextBlobBuilder::SkTextBlobBuilder() {
     reset();
@@ -117,7 +150,7 @@ SkTextBlobBuilder::SkTextBlobBuilder() {
 SkTextBlobBuilder::~SkTextBlobBuilder() {
     // Free any unused chunks.
     for (int i = 0; i < fChunks.count(); ++i) {
-        sk_free(fChunks[i]);
+        SkDELETE(fChunks[i]);
     }
 }
 

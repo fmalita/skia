@@ -20,6 +20,7 @@
 #include "SkUtils.h"
 #include "SkColorPriv.h"
 #include "SkColorFilter.h"
+#include "SkTextBlob.h"
 #include "SkTime.h"
 #include "SkTypeface.h"
 #include "SkXfermode.h"
@@ -77,6 +78,12 @@ static void DrawTheText(SkCanvas* canvas, const char text[], size_t length, SkSc
                         const SkPaint& paint, SkScalar clickX) {
     SkPaint p(paint);
 
+    uint16_t glyphs[1000];
+    SkASSERT(length <= SK_ARRAY_COUNT(glyphs));
+    int glyphCount = paint.textToGlyphs(text, length, glyphs);
+    SkPaint glyphPaint = paint;
+    glyphPaint.setTextEncoding(SkPaint::kGlyphID_TextEncoding);
+
 #if 0
     canvas->drawText(text, length, x, y, paint);
 #else
@@ -88,12 +95,22 @@ static void DrawTheText(SkCanvas* canvas, const char text[], size_t length, SkSc
             pts[i].set(xpos, y), xpos += paint.getTextSize();
         }
         canvas->drawPosText(text, length, pts, paint);
+
+        SkAutoTUnref<SkTextBlob> blob(SkTextBlob::Create(
+                                      SkTextChunk::Create(glyphs, glyphCount, pts, glyphPaint)));
+        canvas->drawTextBlob(blob, SkPoint::Make(0, 400), glyphPaint);
+
     }
 #endif
 
     p.setSubpixelText(true);
     x += SkIntToScalar(180);
     canvas->drawText(text, length, x, y, p);
+
+    glyphPaint.setSubpixelText(true);
+    SkAutoTUnref<SkTextBlob> blob(SkTextBlob::Create(
+                                  SkTextChunk::Create(glyphs, glyphCount, glyphPaint)));
+    canvas->drawTextBlob(blob, SkPoint::Make(x, y + 400), glyphPaint);
 
 #ifdef SK_DEBUG
     if (true) {
