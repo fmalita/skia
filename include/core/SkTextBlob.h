@@ -94,7 +94,7 @@ public:
     void reset();
 
 private:
-    bool hasPending() const { return !fChunks.isEmpty(); }
+    bool hasPending() const { return !fPendingGlyphs.isEmpty(); }
     void commitPendingChunk();
     void resetPendingChunk();
     void convertPendingPositioning(SkTextChunk::Positioning positioning);

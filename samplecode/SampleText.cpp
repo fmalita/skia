@@ -83,6 +83,7 @@ static void DrawTheText(SkCanvas* canvas, const char text[], size_t length, SkSc
     int glyphCount = paint.textToGlyphs(text, length, glyphs);
     SkPaint glyphPaint = paint;
     glyphPaint.setTextEncoding(SkPaint::kGlyphID_TextEncoding);
+    SkTextBlobBuilder blobBuilder;
 
 #if 0
     canvas->drawText(text, length, x, y, paint);
@@ -107,10 +108,22 @@ static void DrawTheText(SkCanvas* canvas, const char text[], size_t length, SkSc
     x += SkIntToScalar(180);
     canvas->drawText(text, length, x, y, p);
 
-    glyphPaint.setSubpixelText(true);
-    SkAutoTUnref<SkTextBlob> blob(SkTextBlob::Create(
+    {
+        glyphPaint.setSubpixelText(true);
+        SkAutoTUnref<SkTextBlob> blob(SkTextBlob::Create(
                                   SkTextChunk::Create(glyphs, glyphCount, glyphPaint)));
-    canvas->drawTextBlob(blob, SkPoint::Make(x, y + 400), glyphPaint);
+        canvas->drawTextBlob(blob, SkPoint::Make(x, y + 400), glyphPaint);
+    }
+
+    {
+        glyphPaint.setSubpixelText(false);
+        glyphPaint.setLinearText(true);
+        for (int i = 0; i < glyphCount; ++i) {
+            blobBuilder.addGlyph(glyphs[i], SkPoint::Make(i * glyphPaint.getTextSize(), 0), glyphPaint);
+        }
+        SkAutoTUnref<const SkTextBlob> blob(blobBuilder.build());
+        canvas->drawTextBlob(blob, SkPoint::Make(x + 180, y + 400), glyphPaint);
+    }
 
 #ifdef SK_DEBUG
     if (true) {
