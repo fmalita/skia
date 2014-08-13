@@ -1,3 +1,9 @@
+/*
+ * Copyright 2014 Google Inc.
+ *
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ */
 
 #include "SkTextBlob.h"
 
@@ -156,12 +162,9 @@ SkTextBlobBuilder::~SkTextBlobBuilder() {
 
 void SkTextBlobBuilder::reset() {
     fChunks.rewind();
-    resetPendingChunk();
 }
 
 const SkTextBlob* SkTextBlobBuilder::build() {
-    commitPendingChunk();
-
     const SkTextBlob* blob = SkNEW_ARGS(SkTextBlob, (fChunks));
     reset();
 
@@ -169,124 +172,7 @@ const SkTextBlob* SkTextBlobBuilder::build() {
 }
 
 void SkTextBlobBuilder::addChunk(SkTextChunk* chunk) {
-    // FIXME: attempt to merge?
-    commitPendingChunk();
-
     *fChunks.append() = chunk;
 }
 
-void SkTextBlobBuilder::addGlyph(uint16_t glyph, const SkPaint& font, const SkRect* bounds) {
-    convertPendingPositioning(SkTextChunk::kNone_Positioning);
 
-    // FIXME: more granular font check
-    if (fPendingFont != font) {
-        commitPendingChunk();
-        fPendingFont = font;
-    }
-
-    updatePendingBounds(bounds);
-    *fPendingGlyphs.append() = glyph;
-}
-
-void SkTextBlobBuilder::addGlyph(uint16_t glyph, const SkScalar pos, const SkPaint& font,
-                                 const SkRect* bounds) {
-    convertPendingPositioning(SkTextChunk::kScalar_Positioning);
-
-    // FIXME: more granular font check
-    if (fPendingFont != font) {
-        commitPendingChunk();
-        fPendingFont = font;
-    }
-
-    updatePendingBounds(bounds);
-
-    *fPendingGlyphs.append() = glyph;
-    *fPendingHPos.append() = pos;
-
-    SkASSERT(fPendingGlyphs.count() == fPendingHPos.count());
-}
-
-void SkTextBlobBuilder::addGlyph(uint16_t glyph, const SkPoint pos, const SkPaint& font,
-                                 const SkRect* bounds) {
-    convertPendingPositioning(SkTextChunk::kPoint_Positioning);
-
-    // FIXME: more granular font check
-    if (fPendingFont != font) {
-        commitPendingChunk();
-        fPendingFont = font;
-    }
-
-    updatePendingBounds(bounds);
-
-    *fPendingGlyphs.append() = glyph;
-    *fPendingPos.append() = pos;
-
-    SkASSERT(fPendingGlyphs.count() == fPendingPos.count());
-}
-
-void SkTextBlobBuilder::updatePendingBounds(const SkRect* bounds) {
-    fPendingBoundsValid &= (NULL != bounds);
-    if (fPendingBoundsValid) {
-        fPendingBounds.join(*bounds);
-    }
-}
-
-void SkTextBlobBuilder::convertPendingPositioning(SkTextChunk::Positioning positioning) {
-    if (fPendingPositioning == positioning) {
-        return;
-    }
-
-    // FIXME: actually convert
-    commitPendingChunk();
-
-    fPendingPositioning = positioning;
-}
-
-void SkTextBlobBuilder::commitPendingChunk() {
-    if (!hasPending()) {
-        SkASSERT(fPendingPos.isEmpty());
-        SkASSERT(fPendingHPos.isEmpty());
-        SkASSERT(fPendingBounds.isEmpty());
-        SkASSERT(fPendingBoundsValid);
-        return;
-    }
-
-    SkTextChunk* chunk = NULL;
-    const SkRect* chunkBounds = fPendingBoundsValid ? &fPendingBounds : NULL;
-
-    switch (fPendingPositioning) {
-    case SkTextChunk::kNone_Positioning:
-        SkASSERT(fPendingPos.isEmpty());
-        SkASSERT(fPendingHPos.isEmpty());
-        chunk = SkTextChunk::Create(fPendingGlyphs.begin(), fPendingGlyphs.count(),
-                                    fPendingFont, chunkBounds);
-        break;
-    case SkTextChunk::kScalar_Positioning:
-        SkASSERT(fPendingPos.isEmpty());
-        chunk = SkTextChunk::Create(fPendingGlyphs.begin(), fPendingGlyphs.count(),
-                                    fPendingHPos.begin(), fPendingFont, chunkBounds);
-        break;
-    case SkTextChunk::kPoint_Positioning:
-        SkASSERT(fPendingHPos.isEmpty());
-        chunk = SkTextChunk::Create(fPendingGlyphs.begin(), fPendingGlyphs.count(),
-                                    fPendingPos.begin(), fPendingFont, chunkBounds);
-        break;
-    default:
-        SkFAIL("unhandled positioning value");
-    }
-
-    SkASSERT(NULL != chunk);
-    *fChunks.append() = chunk;
-
-    resetPendingChunk();
-}
-
-void SkTextBlobBuilder::resetPendingChunk() {
-    fPendingGlyphs.rewind();
-    fPendingHPos.rewind();
-    fPendingPos.rewind();
-
-    fPendingPositioning = SkTextChunk::kNone_Positioning;
-    fPendingBounds.setEmpty();
-    fPendingBoundsValid = true;
-}

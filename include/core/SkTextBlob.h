@@ -25,12 +25,6 @@ public:
     static SkTextChunk* Create(const uint16_t* glyphs, size_t count, const SkPoint* pos,
                                const SkPaint& paint, const SkRect* bounds = NULL);
 
-    enum Positioning {
-        kNone_Positioning,
-        kScalar_Positioning,
-        kPoint_Positioning,
-    };
-
     ~SkTextChunk();
 
     void draw(SkCanvas* canvas, const SkPaint& paint) const;
@@ -44,6 +38,12 @@ private:
                 const SkRect* bounds);
 
     void init(const uint16_t*, size_t, const SkRect*);
+
+    enum Positioning {
+        kNone_Positioning,
+        kScalar_Positioning,
+        kPoint_Positioning,
+    };
 
     size_t         fGlyphCount;
     uint16_t*      fGlyphs;
@@ -84,31 +84,23 @@ public:
     ~SkTextBlobBuilder();
 
     void addChunk(SkTextChunk* chunk);
+
+    // FIXME: should we support glyph-wise ops? Not sure whether this is interesting
+    // for clients at this point -- they likely have a better idea of chunking.
+    /*
     void addGlyph(uint16_t glyph, const SkPaint& font, const SkRect* bounds = NULL);
     void addGlyph(uint16_t glyph, const SkScalar pos, const SkPaint& font,
                   const SkRect* bounds = NULL);
     void addGlyph(uint16_t glyph, const SkPoint pos, const SkPaint& font,
                   const SkRect* bounds = NULL);
+    */
 
     const SkTextBlob* build();
     void reset();
 
 private:
-    bool hasPending() const { return !fPendingGlyphs.isEmpty(); }
-    void commitPendingChunk();
-    void resetPendingChunk();
-    void convertPendingPositioning(SkTextChunk::Positioning positioning);
-    void updatePendingBounds(const SkRect* bounds);
 
     SkTDArray<SkTextChunk*>  fChunks;
-
-    SkTDArray<uint16_t>      fPendingGlyphs;
-    SkTDArray<SkScalar>      fPendingHPos;
-    SkTDArray<SkPoint>       fPendingPos;
-    SkPaint                  fPendingFont; // FIXME: SkFont
-    SkTextChunk::Positioning fPendingPositioning;
-    SkRect                   fPendingBounds;
-    bool                     fPendingBoundsValid;
 };
 
 #endif // SkTextBlob_DEFINED
