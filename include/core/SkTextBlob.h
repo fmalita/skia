@@ -29,6 +29,7 @@ public:
     ~SkTextChunk();
 
     void draw(SkBaseDevice*, const SkDraw&, const SkPaint&) const;
+
     const SkRect& bounds() const;
 
 private:
@@ -39,6 +40,8 @@ private:
                 const SkRect* bounds);
 
     void init(const uint16_t*, size_t, const SkRect*, const SkScalar*);
+
+    friend class SkPictureRecord;
 
     size_t         fGlyphCount;
     uint16_t*      fGlyphs;

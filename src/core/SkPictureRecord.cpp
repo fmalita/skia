@@ -12,6 +12,7 @@
 #include "SkPictureStateTree.h"
 #include "SkPixelRef.h"
 #include "SkRRect.h"
+#include "SkTextBlob.h"
 #include "SkTSearch.h"
 
 #define HEAP_BLOCK_SIZE 4096
@@ -114,6 +115,7 @@ static inline size_t getPaintOffset(DrawType op, size_t opSize) {
         0,  // POP_CULL - no paint
         1,  // DRAW_PATCH - right after op code
         1,  // DRAW_PICTURE_MATRIX_PAINT - right after op code
+        1,  // DRAW_TEXT_BLOB - right after op code
     };
 
     SK_COMPILE_ASSERT(sizeof(gPaintOffsets) == LAST_DRAWTYPE_ENUM + 1,
@@ -1199,6 +1201,54 @@ void SkPictureRecord::onDrawTextOnPath(const void* text, size_t byteLength, cons
     this->addText(text, byteLength);
     this->addPath(path);
     this->addMatrix(m);
+    this->validate(initialOffset, size);
+}
+
+
+void SkPictureRecord::onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
+                                     const SkPaint& paint) {
+    // op + paint index + offset + chunk count
+    size_t size = 3 * kUInt32Size + sizeof(SkPoint);
+    unsigned chunk_count = 0;
+
+    {
+        // Yikes -- we need to scan the chunks upfront to compute the size :(
+        // Hopefully this is going to be irrelevant soon thanks to SkRecord.
+        SkTextBlob::Iter iter(blob);
+        while (const SkTextChunk* chunk = iter.next()) {
+            chunk_count++;
+
+            // len + UID + flags + bounds bool
+            size += 4 * kUInt32Size;
+            if (!chunk->fBoundsDirty) {
+                size += sizeof(chunk->fBounds);
+            }
+            // glyphs
+            size += SkAlign4(chunk->fGlyphCount * sizeof(uint16_t));
+            // positions
+            size += SkAlign4(chunk->fGlyphCount * sizeof(SkScalar) * chunk->fScalarsPerPos);
+        }
+    }
+
+    size_t initialOffset = this->addDraw(DRAW_TEXT_BLOB, &size);
+    SkASSERT(initialOffset+getPaintOffset(DRAW_TEXT_ON_PATH, size) == fWriter.bytesWritten());
+    this->addPaint(paint);
+    this->addPoint(offset);
+    this->addInt(chunk_count);
+
+    SkTextBlob::Iter iter(blob);
+    while (const SkTextChunk* chunk = iter.next()) {
+        this->addInt(SkToInt(chunk->fGlyphCount));
+        this->addInt(0); // FIXME: UID
+        this->addInt(chunk->fScalarsPerPos);
+        this->addRectPtr(chunk->fBoundsDirty ? NULL : &chunk->fBounds);
+        fWriter.writePad(chunk->fGlyphs, chunk->fGlyphCount * sizeof(uint16_t));
+        if (chunk->fScalarsPerPos > 0) {
+            SkASSERT(NULL != chunk->fPos);
+            fWriter.writePad(chunk->fPos, chunk->fGlyphCount * sizeof(SkScalar) * chunk->fScalarsPerPos);
+        }
+    }
+
     this->validate(initialOffset, size);
 }
 

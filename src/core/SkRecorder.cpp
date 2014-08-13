@@ -187,6 +187,11 @@ void SkRecorder::onDrawTextOnPath(const void* text, size_t byteLength, const SkP
            this->copy(matrix));
 }
 
+void SkRecorder::onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
+                                const SkPaint& paint) {
+    APPEND(DrawTextBlob, delay_copy(paint), offset, blob);
+}
+
 void SkRecorder::onDrawPicture(const SkPicture* pic, const SkMatrix* matrix, const SkPaint* paint) {
     APPEND(DrawPicture, this->copy(paint), pic, this->copy(matrix));
 }

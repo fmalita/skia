@@ -422,6 +422,10 @@ void SkDumpCanvas::onDrawTextOnPath(const void* text, size_t byteLength, const S
     this->dump(kDrawText_Verb, &paint, "drawTextOnPath(%s [%d])",
                str.c_str(), byteLength);
 }
+void SkDumpCanvas::onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
+                                  const SkPaint& paint) {
+    // FIXME: impl
+}
 
 void SkDumpCanvas::onDrawPicture(const SkPicture* picture, const SkMatrix* matrix,
                                  const SkPaint* paint) {

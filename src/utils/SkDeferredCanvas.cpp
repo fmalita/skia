@@ -901,6 +901,13 @@ void SkDeferredCanvas::onDrawTextOnPath(const void* text, size_t byteLength, con
     this->recordedDrawCommand();
 }
 
+void SkDeferredCanvas::onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
+                                      const SkPaint& paint) {
+    AutoImmediateDrawIfNeeded autoDraw(*this, &paint);
+    this->drawingCanvas()->drawTextBlob(blob, offset, paint);
+    this->recordedDrawCommand();
+}
+
 void SkDeferredCanvas::onDrawPicture(const SkPicture* picture, const SkMatrix* matrix,
                                      const SkPaint* paint) {
     this->drawingCanvas()->drawPicture(picture, matrix, paint);

@@ -442,6 +442,10 @@ void SkPicturePlayback::handleOp(SkReader32* reader,
             reader->readMatrix(&matrix);
             canvas->drawTextOnPath(text.text(), text.length(), path, &matrix, paint);
         } break;
+        case DRAW_TEXT_BLOB: {
+            // FIXME: impl
+
+        } break;
         case DRAW_VERTICES: {
             SkAutoTUnref<SkXfermode> xfer;
             const SkPaint& paint = *fPictureData->getPaint(reader);

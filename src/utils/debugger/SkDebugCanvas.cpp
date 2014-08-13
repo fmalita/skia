@@ -570,6 +570,11 @@ void SkDebugCanvas::onDrawTextOnPath(const void* text, size_t byteLength, const 
         new SkDrawTextOnPathCommand(text, byteLength, path, matrix, paint));
 }
 
+void SkDebugCanvas::onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
+                                   const SkPaint& paint) {
+    // FIXME: impl
+}
+
 void SkDebugCanvas::drawVertices(VertexMode vmode, int vertexCount,
         const SkPoint vertices[], const SkPoint texs[], const SkColor colors[],
         SkXfermode*, const uint16_t indices[], int indexCount,

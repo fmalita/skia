@@ -89,6 +89,9 @@ public:
                           const SkPath& path,
                           const SkMatrix* matrix,
                           const SkPaint& paint) SK_OVERRIDE;
+    virtual void onDrawTextBlob(const SkTextBlob*,
+                                const SkPoint&,
+                                const SkPaint&) SK_OVERRIDE;
     void onDrawPatch(const SkPoint cubics[12], const SkColor colors[4],
                      const SkPoint texCoords[4], SkXfermode* xmode,
                      const SkPaint& paint) SK_OVERRIDE;

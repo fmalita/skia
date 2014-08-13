@@ -265,6 +265,14 @@ void SkNWayCanvas::onDrawTextOnPath(const void* text, size_t byteLength, const S
     }
 }
 
+void SkNWayCanvas::onDrawTextBlob(const SkTextBlob* blob, const SkPoint& offset,
+                                  const SkPaint& paint) {
+    Iter iter(fList);
+    while (iter.next()) {
+        iter->drawTextBlob(blob, offset, paint);
+    }
+}
+
 void SkNWayCanvas::onDrawPicture(const SkPicture* picture, const SkMatrix* matrix,
                                  const SkPaint* paint) {
     Iter iter(fList);
