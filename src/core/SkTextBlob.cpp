@@ -150,24 +150,18 @@ void SkTextBlob::draw(SkCanvas* canvas, const SkPaint& paint) const {
 }
 
 SkTextBlobBuilder::SkTextBlobBuilder() {
-    reset();
 }
 
 SkTextBlobBuilder::~SkTextBlobBuilder() {
-    // Free any unused chunks.
+    // unused chunks.
     for (int i = 0; i < fChunks.count(); ++i) {
         SkDELETE(fChunks[i]);
     }
 }
 
-void SkTextBlobBuilder::reset() {
-    fChunks.rewind();
-}
-
 const SkTextBlob* SkTextBlobBuilder::build() {
     const SkTextBlob* blob = SkNEW_ARGS(SkTextBlob, (fChunks));
-    reset();
-
+    fChunks.rewind();
     return blob;
 }
 

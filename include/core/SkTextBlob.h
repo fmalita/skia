@@ -96,7 +96,6 @@ public:
     */
 
     const SkTextBlob* build();
-    void reset();
 
 private:
 
