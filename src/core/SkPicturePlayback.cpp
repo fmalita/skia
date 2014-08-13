@@ -12,6 +12,7 @@
 #include "SkPictureRecord.h"
 #include "SkPictureStateTree.h"
 #include "SkReader32.h"
+#include "SkTextBlob.h"
 #include "SkTDArray.h"
 #include "SkTypes.h"
 
@@ -443,8 +444,39 @@ void SkPicturePlayback::handleOp(SkReader32* reader,
             canvas->drawTextOnPath(text.text(), text.length(), path, &matrix, paint);
         } break;
         case DRAW_TEXT_BLOB: {
-            // FIXME: impl
+            const SkPaint& paint = *fPictureData->getPaint(reader);
+            uint32_t chunkCount = reader->readInt();
+            const SkPoint& offset = reader->skipT<SkPoint>();
 
+            SkTextBlobBuilder blobBuilder;
+            for (unsigned i = 0; i < chunkCount; ++i) {
+                uint32_t glyphCount = reader->readInt();
+                const SkPaint& glyphPaint = *fPictureData->getPaint(reader);
+                unsigned scalarsPerPos = reader->readInt();
+                const SkRect* boundsPtr = get_rect_ptr(reader);
+                const uint16_t* glyphs = (uint16_t*)reader->skip(
+                    SkAlign4(glyphCount * sizeof(uint16_t)));
+                SkTextChunk* chunk;
+                if (scalarsPerPos > 0) {
+                    const SkScalar* pos = (const SkScalar*)reader->skip(
+                        SkAlign4(glyphCount * sizeof(SkScalar) * scalarsPerPos));
+                    if (1 == scalarsPerPos) {
+                        chunk = SkTextChunk::Create(glyphs, glyphCount, pos, glyphPaint, boundsPtr);
+                    } else {
+                        SkASSERT(2 == scalarsPerPos);
+                        chunk = SkTextChunk::Create(glyphs, glyphCount, (const SkPoint*)pos,
+                                                    glyphPaint, boundsPtr);
+                    }
+
+                } else {
+                    chunk = SkTextChunk::Create(glyphs, glyphCount, glyphPaint, boundsPtr);
+                }
+
+                blobBuilder.addChunk(chunk);
+            }
+
+            SkAutoTUnref<const SkTextBlob> blob(blobBuilder.build());
+            canvas->drawTextBlob(blob, offset, paint);
         } break;
         case DRAW_VERTICES: {
             SkAutoTUnref<SkXfermode> xfer;
