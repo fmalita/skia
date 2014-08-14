@@ -9,7 +9,7 @@
 
 #include "SkDevice.h"
 
-SkTextChunk* SkTextChunk::Create(const uint16_t* glyphs, size_t count, const SkPaint& paint,
+const SkTextChunk* SkTextChunk::Create(const uint16_t* glyphs, size_t count, const SkPaint& paint,
                                  const SkRect* bounds) {
     if (NULL == glyphs || 0 == count) {
         return NULL;
@@ -18,7 +18,7 @@ SkTextChunk* SkTextChunk::Create(const uint16_t* glyphs, size_t count, const SkP
     return SkNEW_ARGS(SkTextChunk, (glyphs, count, paint, bounds));
 }
 
-SkTextChunk* SkTextChunk::Create(const uint16_t* glyphs, size_t count, const SkScalar* pos,
+const SkTextChunk* SkTextChunk::Create(const uint16_t* glyphs, size_t count, const SkScalar* pos,
                                  const SkPaint& paint, const SkRect* bounds) {
     if (NULL == glyphs || NULL == pos || 0 == count) {
         return NULL;
@@ -27,7 +27,7 @@ SkTextChunk* SkTextChunk::Create(const uint16_t* glyphs, size_t count, const SkS
     return SkNEW_ARGS(SkTextChunk, (glyphs, count, pos, paint, bounds));
 }
 
-SkTextChunk* SkTextChunk::Create(const uint16_t* glyphs, size_t count, const SkPoint* pos,
+const SkTextChunk* SkTextChunk::Create(const uint16_t* glyphs, size_t count, const SkPoint* pos,
                                  const SkPaint& paint, const SkRect* bounds) {
     if (NULL == glyphs || NULL == pos || 0 == count) {
         return NULL;
@@ -117,18 +117,18 @@ void SkTextChunk::draw(SkBaseDevice* device, const SkDraw& draw, const SkPaint& 
     }
 }
 
-SkTextBlob* SkTextBlob::Create(SkTextChunk *chunk) {
-    SkTDArray<SkTextChunk*> chunks;
+const SkTextBlob* SkTextBlob::Create(const SkTextChunk *chunk) {
+    SkTDArray<const SkTextChunk*> chunks;
     chunks.setReserve(1);
     *chunks.append() = chunk;
     return SkNEW_ARGS(SkTextBlob, (chunks));
 }
 
-SkTextBlob* SkTextBlob::Create(const SkTDArray<SkTextChunk*>& chunks) {
+const SkTextBlob* SkTextBlob::Create(const SkTDArray<const SkTextChunk*>& chunks) {
     return SkNEW_ARGS(SkTextBlob, (chunks));
 }
 
-SkTextBlob::SkTextBlob(const SkTDArray<SkTextChunk*>& chunks)
+SkTextBlob::SkTextBlob(const SkTDArray<const SkTextChunk*>& chunks)
     : fChunks(chunks)
     , fUniqueID(SK_InvalidGenID) {
 }
@@ -168,7 +168,7 @@ const SkTextBlob* SkTextBlobBuilder::build() {
     return blob;
 }
 
-void SkTextBlobBuilder::addChunk(SkTextChunk* chunk) {
+void SkTextBlobBuilder::addChunk(const SkTextChunk* chunk) {
     *fChunks.append() = chunk;
 }
 

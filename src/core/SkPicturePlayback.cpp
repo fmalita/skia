@@ -456,7 +456,7 @@ void SkPicturePlayback::handleOp(SkReader32* reader,
                 const SkRect* boundsPtr = get_rect_ptr(reader);
                 const uint16_t* glyphs = (uint16_t*)reader->skip(
                     SkAlign4(glyphCount * sizeof(uint16_t)));
-                SkTextChunk* chunk;
+                const SkTextChunk* chunk;
                 if (scalarsPerPos > 0) {
                     const SkScalar* pos = (const SkScalar*)reader->skip(
                         SkAlign4(glyphCount * sizeof(SkScalar) * scalarsPerPos));

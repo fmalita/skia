@@ -97,7 +97,7 @@ static void DrawTheText(SkCanvas* canvas, const char text[], size_t length, SkSc
         }
         canvas->drawPosText(text, length, pts, paint);
 
-        SkAutoTUnref<SkTextBlob> blob(SkTextBlob::Create(
+        SkAutoTUnref<const SkTextBlob> blob(SkTextBlob::Create(
                                       SkTextChunk::Create(glyphs, glyphCount, pts, glyphPaint)));
         canvas->drawTextBlob(blob, SkPoint::Make(0, 400), glyphPaint);
 
@@ -110,7 +110,7 @@ static void DrawTheText(SkCanvas* canvas, const char text[], size_t length, SkSc
 
     {
         glyphPaint.setSubpixelText(true);
-        SkAutoTUnref<SkTextBlob> blob(SkTextBlob::Create(
+        SkAutoTUnref<const SkTextBlob> blob(SkTextBlob::Create(
                                   SkTextChunk::Create(glyphs, glyphCount, glyphPaint)));
         canvas->drawTextBlob(blob, SkPoint::Make(x, y + 400), glyphPaint);
     }

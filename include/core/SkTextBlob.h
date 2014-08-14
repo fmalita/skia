@@ -15,16 +15,16 @@
 
 class SkBaseDevice;
 class SkDraw;
-class SkPoint;
+struct SkPoint;
 
 class SK_API SkTextChunk {
 public:
-    static SkTextChunk* Create(const uint16_t* glyphs, size_t count, const SkPaint& paint,
-                               const SkRect* bounds = NULL);
-    static SkTextChunk* Create(const uint16_t* glyphs, size_t count, const SkScalar* pos,
-                               const SkPaint& paint, const SkRect* bounds = NULL);
-    static SkTextChunk* Create(const uint16_t* glyphs, size_t count, const SkPoint* pos,
-                               const SkPaint& paint, const SkRect* bounds = NULL);
+    static const SkTextChunk* Create(const uint16_t* glyphs, size_t count, const SkPaint& paint,
+                                     const SkRect* bounds = NULL);
+    static const SkTextChunk* Create(const uint16_t* glyphs, size_t count, const SkScalar* pos,
+                                     const SkPaint& paint, const SkRect* bounds = NULL);
+    static const SkTextChunk* Create(const uint16_t* glyphs, size_t count, const SkPoint* pos,
+                                     const SkPaint& paint, const SkRect* bounds = NULL);
 
     ~SkTextChunk();
 
@@ -57,8 +57,8 @@ private:
 
 class SK_API SkTextBlob : public SkRefCnt {
 public:
-    static SkTextBlob* Create(SkTextChunk* chunk);
-    static SkTextBlob* Create(const SkTDArray<SkTextChunk*>& chunks);
+    static const SkTextBlob* Create(const SkTextChunk* chunk);
+    static const SkTextBlob* Create(const SkTDArray<const SkTextChunk*>& chunks);
 
     ~SkTextBlob();
 
@@ -77,10 +77,10 @@ public:
     };
 
 private:
-    SkTextBlob(const SkTDArray<SkTextChunk*>& chunks);
+    SkTextBlob(const SkTDArray<const SkTextChunk*>& chunks);
 
-    const SkTDArray<SkTextChunk*>  fChunks;
-    mutable uint32_t               fUniqueID;
+    const SkTDArray<const SkTextChunk*>  fChunks;
+    mutable uint32_t                     fUniqueID;
 };
 
 class SK_API SkTextBlobBuilder {
@@ -88,7 +88,7 @@ public:
     SkTextBlobBuilder();
     ~SkTextBlobBuilder();
 
-    void addChunk(SkTextChunk* chunk);
+    void addChunk(const SkTextChunk* chunk);
 
     // FIXME: should we support glyph-wise ops? Not sure whether this is interesting
     // for clients at this point -- they likely have a better idea of chunking.
@@ -104,7 +104,7 @@ public:
 
 private:
 
-    SkTDArray<SkTextChunk*>  fChunks;
+    SkTDArray<const SkTextChunk*>  fChunks;
 };
 
 #endif // SkTextBlob_DEFINED
