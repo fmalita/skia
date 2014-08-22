@@ -275,7 +275,6 @@ void SkLuaCanvas::onDrawTextBlob(const SkTextBlob *blob, SkScalar x, SkScalar y,
     lua.pushScalar(x, "x");
     lua.pushScalar(y, "y");
     lua.pushPaint(paint, "paint");
-
 }
 
 void SkLuaCanvas::onDrawPicture(const SkPicture* picture, const SkMatrix* matrix,

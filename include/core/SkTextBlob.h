@@ -68,6 +68,7 @@ private:
     SkTextBlob(uint16_t* glyphs, SkScalar* pos, const SkTArray<Run>* runs, const SkRect& bounds);
 
     friend class SkCanvas;
+    friend class SkPictureRecord;
     friend class SkTextBlobBuilder;
     friend class TextBlobTester;
 
